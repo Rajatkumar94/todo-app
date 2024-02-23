@@ -1,8 +1,7 @@
+require("dotenv").config();
 const { connect, Schema, model } = require("mongoose");
 
-connect(
-  ""
-);
+connect(process.env.MONGODB_URI);
 
 const todoScheme = Schema({
   title: String,
