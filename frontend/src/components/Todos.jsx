@@ -8,78 +8,84 @@ import {
 } from "../features/todo/todoSlice";
 
 function Todos() {
-  const [isEditable, setIsEditable] = useState(false);
-  const [todo, setTodo] = useState({
-    title: "",
-    description: "",
-  });
-
+  const [editingId, setEditingId] = useState(null);
+  const [editValue, setEditValue] = useState({});
   const dispatch = useDispatch();
 
   const todos = useSelector((state) => state.todos.todos);
 
-  // console.log("todos", todos);
-
-  const handleSubmit = (todoId) => {
-    if (editableTodos[todoId]) {
-      // If already editing, dispatch editTodo
-      dispatch(editTodo(todoId));
-      setEditableTodos({ ...editableTodos, [todoId]: false }); // Reset editing state
-    } else {
-      // If not editing, toggle editing state
-      setEditableTodos({ ...editableTodos, [todoId]: true });
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    // Update the corresponding property in the state object
-    setTodo((prevState) => ({
-      ...prevState,
+  const handleEditInputChange = (event) => {
+    const { name, value } = event.target;
+    setEditValue((prevEditValue) => ({
+      ...prevEditValue,
       [name]: value,
     }));
+  };
+
+  const startEditing = (id, text) => {
+    const { title, description, completed } = text;
+    setEditingId(id);
+    setEditValue({
+      title: title,
+      description: description,
+      // completed: completed,
+    });
+  };
+
+  const finishEditing = () => {
+    console.log("edit value", editValue);
+    dispatch(editTodo({ _id: editingId, ...editValue }));
+    setEditingId(null);
   };
 
   useEffect(() => {
     dispatch(showAllTodos());
   }, []);
+
   return (
     <Suspense>
       <div>
         <h1>Todos</h1>
-        {todos.length === 0 ? (
-          <p>Loading...</p>
-        ) : (
-          todos.map((todo) => (
-            <div key={todo._id}>
-              <h2
-                contentEditable={`${isEditable}`}
-                name="title"
-                onInput={handleInputChange}
-              >
-                {todo.title}
-              </h2>
-              <p
-                contentEditable={`${isEditable}`}
-                name="description"
-                onInput={handleInputChange}
-              >
-                {" "}
-                {todo.description}
-              </p>
-              <button type="button" key={todo._id} onClick={handleSubmit}>
-                {isEditable ? "submit" : "edit"}
-              </button>
-              <button
-                key={todo._id}
-                onClick={() => dispatch(deletedTodo(todo._id))}
-                type="button"
-              >
-                Delete
-              </button>
-            </div>
-          ))
-        )}
+        {todos.map((todo) => (
+          <li key={todo._id}>
+            {editingId === todo._id ? (
+              <>
+                <input
+                  type="text"
+                  name="title"
+                  value={editValue.title}
+                  onChange={handleEditInputChange}
+                />
+                <input
+                  type="text"
+                  name="description"
+                  value={editValue.description}
+                  onChange={handleEditInputChange}
+                />
+                <button onClick={finishEditing}>Save</button>
+              </>
+            ) : (
+              <div key={todo._id}>
+                <input type="text" name="title" value={todo.title} />
+                <input
+                  type="text"
+                  name="description"
+                  value={todo.description}
+                />
+
+                <button onClick={() => startEditing(todo._id, todo)}>
+                  Edit
+                </button>
+                <button
+                  onClick={() => dispatch(deletedTodo(todo._id))}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </li>
+        ))}
       </div>
     </Suspense>
   );

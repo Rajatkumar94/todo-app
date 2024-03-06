@@ -61,10 +61,15 @@ export const deletedTodo = createAsyncThunk(
 export const editTodo = createAsyncThunk(
   "editTodo",
   async (todo, { rejectWithValue }) => {
+    console.log("editTodo", todo);
+
+    const {id, title, description } = todo;
+    console.log(title, description,todo.id);
     try {
-      const response = await fetch(`/todos/update/${id}`, {
+      const response = await fetch(`http://localhost:3000/todos/update/${id}`, {
         method: "PUT",
-        body: JSON.stringify(todo),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({title, description}),
       });
       const result = await response.json();
       return result;
@@ -97,8 +102,10 @@ export const todoSlice = createSlice({
           state.todos = state.todos.filter((t) => t._id !== _id);
         }
       })
-      .addCase(editTodo.fulfilled,(state, action)=>{
-        
+      .addCase(editTodo.fulfilled, (state, action) => {
+        state.todos = state.todos.map((t) => {
+          // t._id = action.payload.id ? action.payload : t;
+        });
       });
   },
 });
