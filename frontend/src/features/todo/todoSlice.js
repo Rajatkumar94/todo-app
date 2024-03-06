@@ -63,13 +63,13 @@ export const editTodo = createAsyncThunk(
   async (todo, { rejectWithValue }) => {
     console.log("editTodo", todo);
 
-    const {id, title, description } = todo;
-    console.log(title, description,todo.id);
+    const { id, title, description } = todo;
+    console.log(title, description, todo.id);
     try {
       const response = await fetch(`http://localhost:3000/todos/update/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({title, description}),
+        body: JSON.stringify({ title, description }),
       });
       const result = await response.json();
       return result;
@@ -103,9 +103,9 @@ export const todoSlice = createSlice({
         }
       })
       .addCase(editTodo.fulfilled, (state, action) => {
-        state.todos = state.todos.map((t) => {
-          // t._id = action.payload.id ? action.payload : t;
-        });
+        state.todos = state.todos.map((t) =>
+          t._id === action.payload.id ? action.payload : t
+        );
       });
   },
 });

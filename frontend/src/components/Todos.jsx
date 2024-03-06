@@ -9,7 +9,7 @@ import {
 
 function Todos() {
   const [editingId, setEditingId] = useState(null);
-  const [editValue, setEditValue] = useState({});
+  const [editValue, setEditValue] = useState({ title: "", description: "" });
   const dispatch = useDispatch();
 
   const todos = useSelector((state) => state.todos.todos);
@@ -22,20 +22,22 @@ function Todos() {
     }));
   };
 
-  const startEditing = (id, text) => {
-    const { title, description, completed } = text;
+  const startEditing = (id, todo) => {
+    const { title, description } = todo;
     setEditingId(id);
-    setEditValue({
-      title: title,
-      description: description,
-      // completed: completed,
-    });
+    setEditValue({ title, description });
   };
 
   const finishEditing = () => {
     console.log("edit value", editValue);
-    dispatch(editTodo({ _id: editingId, ...editValue }));
-    setEditingId(null);
+    dispatch(editTodo({ id: editingId, ...editValue }));
+    setEditingId();
+  };
+
+  const toggleCompleted = (id) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
   };
 
   useEffect(() => {
@@ -56,6 +58,7 @@ function Todos() {
                   value={editValue.title}
                   onChange={handleEditInputChange}
                 />
+
                 <input
                   type="text"
                   name="description"
@@ -65,21 +68,36 @@ function Todos() {
                 <button onClick={finishEditing}>Save</button>
               </>
             ) : (
-              <div key={todo._id}>
-                <input type="text" name="title" value={todo.title} />
+              <div
+                key={todo._id}
+                style={{
+                  textDecoration: todo.completed ? "line-through" : "none",
+                }}
+              >
+                <input
+                  type="text"
+                  name="title"
+                  value={todo.title}
+                  readOnly
+                  style={{
+                    textDecoration: todo.completed ? "line-through" : "none",
+                  }}
+                  onClick={() => toggleCompleted(todo.id)}
+                />
                 <input
                   type="text"
                   name="description"
                   value={todo.description}
+                  readOnly
+                  style={{
+                    textDecoration: todo.completed ? "line-through" : "none",
+                  }}
+                  onClick={() => toggleCompleted(todo.id)}
                 />
-
                 <button onClick={() => startEditing(todo._id, todo)}>
                   Edit
                 </button>
-                <button
-                  onClick={() => dispatch(deletedTodo(todo._id))}
-                  type="button"
-                >
+                <button onClick={() => dispatch(deletedTodo(todo._id))}>
                   Delete
                 </button>
               </div>
