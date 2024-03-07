@@ -19,7 +19,7 @@ function Todos() {
   const handleFilterChange = (event) => {
     const { value } = event.target;
     setFilterOption(value);
-    onFilterChange(value);
+    // onFilterChange(value);
   };
 
   const handleEditInputChange = (event) => {
@@ -85,7 +85,7 @@ function Todos() {
           />
           <label htmlFor="notCompleted">Not Completed</label>
         </div>
-        {todos &&
+        {
           todos
             .filter((todo) => {
               if (searchData.length === 0) {

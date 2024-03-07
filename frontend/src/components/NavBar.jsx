@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { searchTodo } from "../features/todo/todoSlice";
 
@@ -10,8 +10,12 @@ function NavBar() {
 
   const handleChange = (e) => {
     setSearch(e.target.value);
-    dispatch(searchTodo(search));
+    // dispatch(searchTodo(search));
   };
+
+  useEffect(() => {
+    dispatch(searchTodo(search));
+  }, [search]);
 
   return (
     <div className="bg-gradient-to-r from-neutral-300 to-stone-400 flex justify-between p-5 rounded-lg  text-xl text-red-300 font-bold">

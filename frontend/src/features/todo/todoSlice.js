@@ -5,7 +5,6 @@ const initialState = {
   searchData: [],
 };
 
-
 //create action for creating the slice
 export const createTodo = createAsyncThunk(
   "createTodo",
@@ -128,9 +127,10 @@ export const todoSlice = createSlice({
         }
       })
       .addCase(editTodo.fulfilled, (state, action) => {
-        state.todos = state.todos.map((t) =>
-          t._id === action.payload.id ? action.payload : t
+        const updatedTodos = state.todos.map((todo) =>
+          todo._id === action.payload._id ? action.payload : todo
         );
+        state.todos = updatedTodos;
       })
       .addCase(toggleTodo.fulfilled, (state, action) => {
         const index = state.todos.findIndex(
@@ -145,4 +145,4 @@ export const todoSlice = createSlice({
 });
 
 export default todoSlice.reducer;
-export const {searchTodo} = todoSlice.actions;
+export const { searchTodo } = todoSlice.actions;
