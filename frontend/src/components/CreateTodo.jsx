@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createTodo } from "../features/todo/todoSlice";
 
@@ -17,7 +17,7 @@ function CreateTodo() {
     dispatch(createTodo(todo));
   };
   return (
-    <div>
+    <div style={{ display: "block" }}>
       <form onSubmit={handleFormSubmit}>
         <input
           type="text"

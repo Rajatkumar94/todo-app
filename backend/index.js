@@ -1,5 +1,5 @@
 const express = require("express");
-const { createTodo, id } = require("./types");
+const { createTodo, todoIdSchema } = require("./types");
 const { TodoModel } = require("./db");
 const app = express();
 const cors = require("cors");
@@ -41,35 +41,39 @@ app.post("/todos/", async (req, res) => {
 
 app.put("/todos/update/:id", async function (req, res) {
   const id = req.params.id;
-  const {title,description} = req.body;
+  const { title, description } = req.body;
 
   try {
-    const todoUpdate = await TodoModel.findByIdAndUpdate(id,{title,description},{new:true});
-    res.send(todoUpdate)
+    const todoUpdate = await TodoModel.findByIdAndUpdate(
+      id,
+      { title, description },
+      { new: true }
+    );
+    res.send(todoUpdate);
   } catch (err) {
-    res.status(500).send(err)
+    res.status(500).send(err);
   }
 });
 
 app.put("/todos/completed/:id", async (req, res) => {
-  // const updatePayload = req.body;
-  // const parsedpayload = id.safeParse(updatePayload);
-
-
   const id = req.params.id;
-  // if (!parsedpayload.success) {
-  //   res.status(411).send({ message: "You have sent an invalid" });
-  // }
 
   try {
-    await TodoModel.update(
-      {
-        _id: req.params.id,
-      },
-      {
-        completed: !true,
-      }
+    // Find the todo by ID
+    const todo = await TodoModel.findById(id);
+
+    if (!todo) {
+      return res.status(404).send({ message: "Todo not found" });
+    }
+
+    // Toggle the completed status
+    const updatedTodo = await TodoModel.findByIdAndUpdate(
+      id,
+      { completed: !todo.completed }, // Toggle the completed status
+      { new: true }
     );
+
+    res.status(200).send(updatedTodo);
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

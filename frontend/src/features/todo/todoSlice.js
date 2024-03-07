@@ -2,7 +2,9 @@ import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   todos: [],
+  searchData: [],
 };
+
 
 //create action for creating the slice
 export const createTodo = createAsyncThunk(
@@ -79,11 +81,34 @@ export const editTodo = createAsyncThunk(
   }
 );
 
+//toggle action
+export const toggleTodo = createAsyncThunk(
+  "toggleTodo",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/todos/completed/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const result = await response.json();
+      return result;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const todoSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
     addTodo: (state, action) => {},
+    searchTodo: (state, action) => {
+      state.searchData = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -106,8 +131,18 @@ export const todoSlice = createSlice({
         state.todos = state.todos.map((t) =>
           t._id === action.payload.id ? action.payload : t
         );
+      })
+      .addCase(toggleTodo.fulfilled, (state, action) => {
+        const index = state.todos.findIndex(
+          (todo) => todo._id === action.payload._id
+        );
+        if (index !== -1) {
+          // Replace the todo at the found index with the updated one
+          state.todos[index] = action.payload;
+        }
       });
   },
 });
 
 export default todoSlice.reducer;
+export const {searchTodo} = todoSlice.actions;

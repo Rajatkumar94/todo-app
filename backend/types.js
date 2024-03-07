@@ -5,11 +5,11 @@ const createTodo = object({
   description: string(),
 });
 
-const id = object({
+const todoIdSchema = object({
   id: string(),
 });
 
 module.exports = {
   createTodo,
-  id,
+  todoIdSchema,
 };
